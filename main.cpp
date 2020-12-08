@@ -35,9 +35,10 @@ ROM readRom(std::string romname){
     //open rom file (not using the std namespace because you hate me)
     std::basic_ifstream<unsigned char> romf;
     std::cout << romname << std::endl;
-    romf.open(romname.c_str(), std::ios::in|std::ios::binary|std::ios::ate );
 
-    //romf.seekg(0, romf.beg);
+    romf.seekg(0, std::ios::beg);
+
+    romf.open(romname.c_str(), std::ios::in|std::ios::binary|std::ios::ate );
 
     //read header
     rom.header = (unsigned char*)calloc(1, 16);
@@ -45,8 +46,6 @@ ROM readRom(std::string romname){
     //check for trainer and ines2.0
     rom.hasTrainer = (rom.header[6]&4) != 0 ? true : false; 
     rom.isines2 = (rom.header[7]&0x0C) == 8 ? true : false;
-    
-    //std::cout << romf.tellg() << std::endl;
 
     //if there is a trainer read and go past that
     if(rom.hasTrainer){
