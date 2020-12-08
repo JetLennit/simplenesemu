@@ -6,8 +6,10 @@ class CPU {
     public:
         //http://wiki.nesdev.com/w/index.php/CPU_memory_map
         unsigned char memory[0xFFFF] = {};
+
         //$0000 - $1FFF (ram)
         unsigned char *ram = memory;
+
         //$2000 - $2007 (PPU registers http://wiki.nesdev.com/w/index.php/PPU_registers)
         unsigned char *ppu_reg = memory + 0x2000;
         unsigned char *PPUCTRL = ppu_reg;
@@ -18,6 +20,7 @@ class CPU {
         unsigned char *PPUSCROLL = ppu_reg + 0x5;
         unsigned char *PPUADDR = ppu_reg + 0x6;
         unsigned char *PPUDATA = ppu_reg + 0x7;
+
         //$4000 - $4017 (2A03 registers)
         unsigned char *APUIORegisters = memory + 0x4000;
         unsigned char *SQ1_VOL = APUIORegisters;
@@ -44,6 +47,7 @@ class CPU {
         unsigned char *JOY2 = APUIORegisters + 0x17;
         //I'm not gonna deal with the CPU test mode registers, they don't really seem to matter
         //I'm also not sure if we need to put the data from the ROM into here, only time will tell
+        
         //http://wiki.nesdev.com/w/index.php/CPU_registers
         unsigned char A;
         unsigned char X;
