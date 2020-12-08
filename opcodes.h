@@ -4,13 +4,13 @@ Stores all the opcodes for the 6502 (hopefully)
 TODO:
 */
 
-struct OPCODE_s
+class OPCODE
 {
-    unsigned char opcode;
-    char* instruction;
-    unsigned char bytes;
+    public:
+        unsigned char opcode;
+        std::string instruction;
+        unsigned char bytes;
 };
-typedef struct OPCODE_s OPCODE;
 
 //http://obelisk.me.uk/6502/reference.html
 //http://nesdev.com/undocumented_opcodes.txt
