@@ -20,6 +20,8 @@ class CPU {
         unsigned char X;
         unsigned char Y;
         unsigned short PC;
+        unsigned char S;
+        unsigned char P;
 
 };
 

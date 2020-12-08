@@ -1,3 +1,8 @@
 1) 6502 emulator
-2) Using the opcodes
-3) Display to the screen 
+    a) CPU/APU
+        http://wiki.nesdev.com/w/index.php/2A03
+    b) PPU
+        http://wiki.nesdev.com/w/index.php/PPU
+2) Implement SDL2 (if nothing else so we can use it's delay function for cpu timing)
+3) Using the opcodes
+4) Display to the screen 
