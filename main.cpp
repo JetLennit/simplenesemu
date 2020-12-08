@@ -13,7 +13,14 @@ const int CLOCK_SPEED = 1790000;
 
 class CPU {
     public:
+        //http://wiki.nesdev.com/w/index.php/CPU_memory_map
         unsigned char ram[2048];
+        //http://wiki.nesdev.com/w/index.php/CPU_registers
+        unsigned char A;
+        unsigned char X;
+        unsigned char Y;
+        unsigned short PC;
+
 };
 
 class ROM
