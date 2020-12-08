@@ -64,6 +64,7 @@ class CPU {
             }
             //store byte at that ram location (taking into account the potential of using the mirrored locations)
             ram[location % 0x800] = stored;
+            return 1;
         }
 
         unsigned char getRAM(unsigned short location){
