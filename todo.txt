@@ -5,4 +5,6 @@
         http://wiki.nesdev.com/w/index.php/PPU
 2) Implement SDL2 (if nothing else so we can use it's delay function for cpu timing)
 3) Using the opcodes
-4) Display to the screen 
+4) Display to the screen
+
+Extra: Look into an actual makefile  
