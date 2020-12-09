@@ -1,4 +1,4 @@
-class APU {
+class PPU {
     public:
         Bus *bus;
 };

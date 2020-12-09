@@ -31,7 +31,7 @@ void initSys(){
 }
 
 int main(){
-    initCPU();
+    initSys();
     std::cout << bus.loadROM("Super Mario Bros..nes") << std::endl;
     std::cout << bus.memory[0x8000] << std::endl;
     return 0;
