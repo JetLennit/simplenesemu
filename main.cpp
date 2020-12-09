@@ -6,7 +6,9 @@
 #include "opcodes.h"
 #include "rom.h"
 #include "bus.h"
+#include "apu.h"
 #include "cpu.h"
+#include "ppu.h"
 
 //using namespace std;
 //if only i could
@@ -15,10 +17,14 @@
 const int CLOCK_SPEED = 1790000;
 
 Bus bus;
+APU apu;
 CPU cpu;
+PPU ppu;
 
-void initCPU(){
+void initSys(){
+    apu.bus = &bus;
     cpu.bus = &bus;
+    ppu.bus = &bus;
     //these are for testing the properties of pointers, they're temporary. i'm only keeping them for now so i remember how to do it
     //*bus.SQ1_HI = 'a';
     //std::cout << cpu.bus->SQ1_HI << std::endl;
