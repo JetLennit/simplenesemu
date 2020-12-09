@@ -48,6 +48,22 @@ class Bus {
         //I'm not gonna deal with the CPU test mode registers, they don't really seem to matter
         //I'm also not sure if we need to put the data from the ROM into here, only time will tell
 
+        //here's where the rom is mapped to memory, it's also where we'll need to do a lot of work later to make other games work
+        int loadROM(std::string romname){
+            ROM rom = readROM(romname);
+            if(rom.mapper == 0){
+                //this assumes the specific rom of smb, i'll fix it later to include other nrom games
+                //load cartridge prg-rom into cpu memory
+                for(int i = 0; i < rom.prglen; i++) cpu_memory[0x8000 + i] = rom.prg[i];
+                //add ppu memory later
+                return 1;
+            }
+            else{
+                std::cerr << "Mapper not recognized, stick to NROM until we have more implemented" << std::endl;
+                return -1;
+            }
+        }
+
         int storeRAM(unsigned short location, unsigned char stored){
             //make sure that location is within ram or the mirrors of the ram
             if(location >= 0x2000){
@@ -67,21 +83,5 @@ class Bus {
             }
             //return byte at that ram location (taking into account the potential of using the mirrored locations)
             return ram[location % 0x800];
-        }
-
-        //here's where the rom is mapped to memory, it's also where we'll need to do a lot of work later to make other games work
-        int loadROM(std::string romname){
-            ROM rom = readROM(romname);
-            if(rom.mapper == 0){
-                //this assumes the specific rom of smb, i'll fix it later to include other nrom games
-                //load cartridge prg-rom into cpu memory
-                for(int i = 0; i < rom.prglen; i++) cpu_memory[0x8000 + i] = rom.prg[i];
-                //add ppu memory later
-                return 1;
-            }
-            else{
-                std::cerr << "Mapper not recognized, stick to NROM until we have more implemented" << std::endl;
-                return -1;
-            }
         }
 };
