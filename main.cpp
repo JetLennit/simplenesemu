@@ -25,15 +25,11 @@ void initSys(){
     apu.bus = &bus;
     cpu.bus = &bus;
     ppu.bus = &bus;
-    //these are for testing the properties of pointers, they're temporary. i'm only keeping them for now so i remember how to do it
-    //*bus.SQ1_HI = 'a';
-    //std::cout << cpu.bus->SQ1_HI << std::endl;
 }
 
 int main(){
     initSys();
-    std::cout << bus.loadROM("Super Mario Bros..nes") << std::endl;
-    std::cout << bus.memory[0x8000] << std::endl;
+    bus.loadROM("Super Mario Bros..nes");
     return 0;
 }
 

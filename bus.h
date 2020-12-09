@@ -5,13 +5,13 @@ Handles the memory mostly
 class Bus {
     public:
         //http://wiki.nesdev.com/w/index.php/CPU_memory_map
-        unsigned char memory[0xFFFF] = {};
+        unsigned char cpu_memory[0xFFFF] = {};
 
         //$0000 - $1FFF (ram)
-        unsigned char *ram = memory;
+        unsigned char *ram = cpu_memory;
 
         //$2000 - $2007 (PPU registers http://wiki.nesdev.com/w/index.php/PPU_registers)
-        unsigned char *ppu_reg = memory + 0x2000;
+        unsigned char *ppu_reg = cpu_memory + 0x2000;
         unsigned char *PPUCTRL = ppu_reg;
         unsigned char *PPUMASK = ppu_reg + 0x1;
         unsigned char *PPUSTATUS = ppu_reg + 0x2;
@@ -22,7 +22,7 @@ class Bus {
         unsigned char *PPUDATA = ppu_reg + 0x7;
 
         //$4000 - $4017 (2A03 registers)
-        unsigned char *APUIORegisters = memory + 0x4000;
+        unsigned char *APUIORegisters = cpu_memory + 0x4000;
         unsigned char *SQ1_VOL = APUIORegisters;
         unsigned char *SQ1_SWEEP = APUIORegisters + 0x01;
         unsigned char *SQ1_LO = APUIORegisters + 0x02;
@@ -74,12 +74,14 @@ class Bus {
             ROM rom = readROM(romname);
             if(rom.mapper == 0){
                 //this assumes the specific rom of smb, i'll fix it later to include other nrom games
-                //load cartridge rom into memory
-                std::cout << rom.chrlen + rom.prglen + 0x8000 << std::endl;
-                for(int i = 0; i < rom.prglen; i++) memory[0x8000 + i] = rom.prg[i];
-                for(int i = 0; i < rom.chrlen; i++) memory[0x8000 + rom.prglen + i] = rom.chr[i];
+                //load cartridge prg-rom into cpu memory
+                for(int i = 0; i < rom.prglen; i++) cpu_memory[0x8000 + i] = rom.prg[i];
+                //add ppu memory later
                 return 1;
             }
-            return -1;
+            else{
+                std::cerr << "Mapper not recognized, stick to NROM until we have more implemented" << std::endl;
+                return -1;
+            }
         }
 };

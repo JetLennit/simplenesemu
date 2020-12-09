@@ -1,5 +1,5 @@
 /*
-Handles the game ROM, may need to make it interact with CPU.h better
+Handles the game ROM
 */
 
 class ROM {
