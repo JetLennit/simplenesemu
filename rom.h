@@ -2,8 +2,7 @@
 Handles the game ROM, may need to make it interact with CPU.h better
 */
 
-class ROM
-{
+class ROM {
     //http://wiki.nesdev.com/w/index.php/INES
     public:
         //we can worry about iNES2 later, most roms don't require the specific features and it's backwards compatibile with iNES
@@ -12,13 +11,14 @@ class ROM
         bool hasTrainer;
         int prglen;
         int chrlen;
+        unsigned char mapper;
         unsigned char *header;
         unsigned char *trainer;
         unsigned char *prg;
         unsigned char *chr;
 };
 
-ROM readRom(std::string romname){
+ROM readROM(std::string romname){
     ROM rom;
 
     //open rom file (not using the std namespace because you hate me)
@@ -35,6 +35,8 @@ ROM readRom(std::string romname){
     //check for trainer and ines2.0
     rom.hasTrainer = (rom.header[6]&4) != 0 ? true : false; 
     rom.isines2 = (rom.header[7]&0x0C) == 8 ? true : false;
+
+    rom.mapper = ((rom.header[6] & 0xF0) >> 4) | (rom.header[7] & 0xF0);
 
     //if there is a trainer read and go past that (for the most part we don't need to worry about the trainer)
     //http://wiki.nesdev.com/w/index.php/INES#Trainer
