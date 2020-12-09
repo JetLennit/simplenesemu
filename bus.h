@@ -1,4 +1,6 @@
-
+/*
+Handles the memory mostly
+*/
 
 class Bus {
     public:
