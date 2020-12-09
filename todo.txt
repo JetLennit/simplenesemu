@@ -1,10 +1,14 @@
-1) 6502 emulator
-    a) CPU/APU
-        http://wiki.nesdev.com/w/index.php/2A03
-    b) PPU
-        http://wiki.nesdev.com/w/index.php/PPU
-2) Implement SDL2 (if nothing else so we can use it's delay function for cpu timing)
-3) Using the opcodes
-4) Display to the screen
+Main
+1) CPU http://wiki.nesdev.com/w/index.php/2A03
+2) PPU http://wiki.nesdev.com/w/index.php/PPU
+3) Basic APU (no functionality) http://wiki.nesdev.com/w/index.php/APU
+4) Opcodes
+5) Implement SDL2 (if nothing else so we can use it's delay function for cpu timing)
+6) Display to the screen
+7) Keyboard input
+8) Proper APU with sound emulation 
+9) Add additional mappers
 
-Extra: Look into an actual makefile  
+Extras: 
+Look into an actual makefile  
+Implement joystick support
