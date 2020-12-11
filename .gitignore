@@ -3,6 +3,7 @@
 *.swp
 *.swo
 *.exe
+main
 .vscode/*
 .vscode
 notes.txt
