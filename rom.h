@@ -36,7 +36,7 @@ ROM readROM(std::string romname){
     rom.hasTrainer = (rom.header[6]&4) != 0 ? true : false; 
     rom.isines2 = (rom.header[7]&0x0C) == 8 ? true : false;
 
-    rom.mapper = ((rom.header[6] & 0xF0) >> 4) | (rom.header[7] & 0xF0);
+    rom.mapper = ((rom.header[6] & 0b11110000) >> 4) | (rom.header[7] & 0b11110000);
 
     //if there is a trainer read and go past that (for the most part we don't need to worry about the trainer)
     //http://wiki.nesdev.com/w/index.php/INES#Trainer
