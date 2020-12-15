@@ -1,6 +1,6 @@
 GXX = g++
 SRC = main.cpp
-OUT = main.exe
+OUT = main
 FLAGS = -static
 LIBS = #-lmingw32 -lSDL2main -lSDL2
 
