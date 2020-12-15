@@ -64,24 +64,37 @@ class Bus {
             }
         }
 
-        int storeRAM(unsigned short location, unsigned char stored){
-            //make sure that location is within ram or the mirrors of the ram
-            if(location >= 0x2000){
+        bool storeCPUMem(unsigned short location, unsigned char stored){
+            //make sure that location is within memory
+            if(location > 0xFFFF){
                 std::cerr << "Trying to access memory out of range" << std::endl;
-                return -1;
+                return false;
             }
-            //store byte at that ram location (taking into account the potential of using the mirrored locations)
-            ram[location % 0x800] = stored;
-            return 1;
+
+            if(location < 0x2000) 
+                ram[location % 0x800] = stored;
+            else if(location < 0x4000) 
+                ppu_reg[location % 0x8] = stored;
+            else 
+                cpu_memory[location] = stored;
+
+            return true;
         }
 
-        unsigned char getRAM(unsigned short location){
-            //make sure that location is within ram or the mirrors of the ram
-            if(location >= 0x2000){
+        unsigned char getCPUMem(unsigned short location){
+            //make sure that location is within memory
+            if(location > 0xFFFF){
                 std::cerr << "Trying to access memory out of range" << std::endl;
-                return -1;
+                return 0;
             }
-            //return byte at that ram location (taking into account the potential of using the mirrored locations)
-            return ram[location % 0x800];
-        }
+
+            if(location < 0x2000) 
+                return ram[location % 0x800];
+            else if(location < 0x4000) 
+                return ppu_reg[location % 0x8];
+            else 
+                return cpu_memory[location];
+
+            return 0;
+        }   
 };
