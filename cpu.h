@@ -18,7 +18,7 @@ class CPU {
         unsigned char Z = 0b00000010;
         unsigned char I = 0b00000100;
         unsigned char B = 0b00110000;
-        unsigned char O = 0b01000000;
+        unsigned char V = 0b01000000;
         unsigned char N = 0b10000000;
 
         void runOpcode(unsigned char op, unsigned short arg){
@@ -33,11 +33,14 @@ class CPU {
             
             bool acc = false;
             unsigned short address = 0;
+            
+            //for instructions that interact with memory
+            unsigned char tmp = 0;
 
-            if(currop.addressmode != 0x7)
-                address = getAddress(arg, currop.addressmode);
-            else
+            if(currop.addressmode == 0x7)
                 acc = true;
+            else
+                address = getAddress(arg, currop.addressmode);
 
             std::string inst = currop.instruction;
             if(inst == "ADC"){
@@ -45,18 +48,67 @@ class CPU {
             }
             else if(inst == "AND"){
                 A = A & bus->getCPUMem(address);
-                ZF();
-                NF();
+                ZF(A);
+                NF(A);
             }
             else if(inst == "ASL"){
                 if(acc){
-                    P = P | (A & 0b1);
+                    CF(A & 0b10000000);
                     A = A << 1;
                 }
-                ZF();
-                NF();
+                else{
+                    tmp = bus->getCPUMem(address);
+                    CF(tmp & 0b10000000);
+                    bus->storeCPUMem(address, tmp << 1);
+                }
+                ZF(A);
+                NF(A);
             }
-            
+            else if(inst == "BCC"){
+                //add later
+            }
+            else if(inst == "BCS"){
+                //add later
+            }
+            else if(inst == "BEQ"){
+                //add later
+            }
+            else if(inst == "BIT"){
+                tmp = bus->getCPUMem(address) & A;
+                ZF(tmp);
+                NF(tmp);
+                VF(tmp);
+            }
+            else if(inst == "BMI"){
+                //add later
+            }
+            else if(inst == "BNE"){
+                //add later
+            }
+            else if(inst == "BPL"){
+                //add later
+            }
+            else if(inst == "BRK"){
+                //add later
+            }
+            else if(inst == "BVC"){
+                //add later
+            }
+            else if(inst == "BRS"){
+                //add later
+            }
+            else if(inst == "CLC"){
+                CF(false);
+            }
+            else if(inst == "CLD"){
+                //unused by the nes
+            }
+            else if(inst == "CLI"){
+                IF(false);
+            }
+            else if(inst == "CLV"){
+                IF(false);
+            }
         }
 
     private:
@@ -68,21 +120,45 @@ class CPU {
                     break;
             }
         }
+        
+        //sets carry flag based on bytes (gonna be doing this a lot)
+        void CF(bool in){
+            if(in)
+                P = P | C;
+            else
+                P = P & ~C;
+        }
+
+         //sets carry flag based on bytes (gonna be doing this a lot)
+        void IF(bool in){
+            if(in)
+                P = P | I;
+            else
+                P = P & ~I;
+        }
 
         //sets zero flag (gonna be doing this a lot)
-        void ZF(){
-            if(A == 0)
+        void ZF(unsigned char in){
+            if(in == 0)
                 P = P | Z;
             else
                 P = P & ~Z;
         }
 
         //sets negative flag (gonna be doing this a lot)
-        void NF(){
-            if(A & 0b10000000)
+        void NF(unsigned char in){
+            if(in & N)
                 P = P | N;
             else
                 P = P & ~N;
+        }
+
+        //sets overflow flag (gonna be doing this a lot)
+        void VF(unsigned char in){
+            if(in & V)
+                P = P | V;
+            else
+                P = P & ~V;
         }
 };
 
