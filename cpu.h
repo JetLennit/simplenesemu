@@ -35,7 +35,7 @@ class CPU {
             unsigned short address = 0;
             
             //for instructions that interact with memory
-            unsigned char tmp = 0;
+            unsigned char M = 0;
 
             if(currop.addressmode == 0x7)
                 acc = true;
@@ -48,21 +48,24 @@ class CPU {
             }
             else if(inst == "AND"){
                 A = A & bus->getCPUMem(address);
-                ZF(A);
-                NF(A);
+                ZF(A == 0);
+                NF(A & N);
             }
             else if(inst == "ASL"){
                 if(acc){
                     CF(A & 0b10000000);
                     A = A << 1;
+                ZF(A == 0);
+                NF(A & N);
                 }
                 else{
-                    tmp = bus->getCPUMem(address);
-                    CF(tmp & 0b10000000);
-                    bus->storeCPUMem(address, tmp << 1);
+                    M = bus->getCPUMem(address);
+                    CF(M & 0b00000001);
+                    M = M << 1;
+                    bus->storeCPUMem(address, M);
+                    ZF(M == 0);
+                    NF(M & N);
                 }
-                ZF(A);
-                NF(A);
             }
             else if(inst == "BCC"){
                 //add later
@@ -74,10 +77,10 @@ class CPU {
                 //add later
             }
             else if(inst == "BIT"){
-                tmp = bus->getCPUMem(address) & A;
-                ZF(tmp);
-                NF(tmp);
-                VF(tmp);
+                M = bus->getCPUMem(address) & A;
+                ZF(M == 0);
+                NF(M & N);
+                VF(M & V);
             }
             else if(inst == "BMI"){
                 //add later
@@ -107,8 +110,186 @@ class CPU {
                 IF(false);
             }
             else if(inst == "CLV"){
-                IF(false);
+                VF(false);
             }
+            else if(inst == "CMP"){
+                M = bus->getCPUMem(address);
+                CF(A >= M);
+                ZF(A == M);
+            }
+            else if(inst == "CPX"){
+                M = bus->getCPUMem(address);
+                CF(X >= M);
+                ZF(X == M);
+            }
+            else if(inst == "CPY"){
+                M = bus->getCPUMem(address);
+                CF(Y >= M);
+                ZF(Y == M);
+            }
+            else if(inst == "DEC"){
+                M = bus->getCPUMem(address);
+                bus->storeCPUMem(M - 1, address);
+            }
+            else if(inst == "DEX"){
+                X--;
+            }
+            else if(inst == "DEY"){
+                Y--;
+            }
+            else if(inst == "EOR"){
+                A = A ^ bus->getCPUMem(address);
+                ZF(A == 0);
+                NF(A & N);
+            }
+            else if(inst == "INC"){
+                M = bus->getCPUMem(address);
+                bus->storeCPUMem(M + 1, address);
+            }
+            else if(inst == "INX"){
+                X++;
+            }
+            else if(inst == "INY"){
+                Y++;
+            }
+            else if(inst == "JMP"){
+                //add later
+            }
+            else if(inst == "JSR"){
+                //add later
+            }
+            else if(inst == "LDA"){
+                A = bus->getCPUMem(address);
+                ZF(A == 0);
+                NF(A & N);
+            }
+            else if(inst == "LDX"){
+                X = bus->getCPUMem(address);
+                ZF(X == 0);
+                NF(X & N);
+            }
+            else if(inst == "LDY"){
+                Y = bus->getCPUMem(address);
+                ZF(Y == 0);
+                NF(Y & N);
+            }
+            else if(inst == "LSR"){
+                if(acc){
+                    CF(A & 0b00000001);
+                    A = A >> 1;
+                    ZF(A == 0);
+                    NF(A & N);
+                }
+                else{
+                    M = bus->getCPUMem(address);
+                    CF(M & 0b00000001);
+                    M = M >> 1;
+                    bus->storeCPUMem(address, M);
+                    ZF(M == 0);
+                    NF(M & N);
+                }
+            }
+            else if(inst == "NOP");
+            else if(inst == "ORA"){
+                M = bus->getCPUMem(address);
+                A = A | M;
+            }
+            else if(inst == "PHA"){
+                //add later
+            }
+            else if(inst == "PHP"){
+                //add later
+            }
+            else if(inst == "PLA"){
+                //add later
+            }
+            else if(inst == "PLP"){
+                //add later
+            }
+            else if(inst == "ROL"){
+                bool ctmp = P & C;
+                if(acc){
+                    CF(A & 0b10000000);
+                    A = (A << 1) | ctmp;
+                    ZF(A == 0);
+                    NF(A & N);
+                }
+                else{
+                    M = bus->getCPUMem(address);
+                    CF(M & 0b10000000);
+                    M = (M << 1) | ctmp;
+                    bus->storeCPUMem(address, M);
+                    ZF(M == 0);
+                    NF(M & N);
+                }
+            }
+            else if(inst == "ROR"){
+                bool ctmp = P & C;
+                if(acc){
+                    CF(A & 0b00000001);
+                    A = (A >> 1) | (A << 7);
+                    ZF(A == 0);
+                    NF(A & N);
+                }
+                else{
+                    M = bus->getCPUMem(address);
+                    CF(M & 0b00000001);
+                    M = (M >> 1) | (ctmp << 7);
+                    bus->storeCPUMem(address, M);
+                    ZF(M == 0);
+                    NF(M & N);
+                }
+            }
+            else if(inst == "RTI"){
+                //add later
+            }
+            else if(inst == "RTS"){
+                //add later
+            }
+            else if(inst == "SBC"){
+                CF(true);
+            }
+            else if(inst == "SEC"){
+                //unused on the nes
+            }
+            else if(inst == "STA"){
+                bus->storeCPUMem(A, address);
+            }
+            else if(inst == "STX"){
+                bus->storeCPUMem(X, address);
+            }
+            else if(inst == "STY"){
+                bus->storeCPUMem(Y, address);
+            }
+            else if(inst == "TAX"){
+                X = A;
+                ZF(X == 0);
+                NF(X & N);
+            }
+            else if(inst == "TAY"){
+                Y = A;
+                ZF(Y == 0);
+                NF(Y & N);
+            }
+            else if(inst == "TSX"){
+                X = S;
+                ZF(X == 0);
+                NF(X & N);
+            }
+            else if(inst == "TXA"){
+                A = X;
+                ZF(A == 0);
+                NF(A & N);
+            }
+            else if(inst == "TXS"){
+                S = X;
+            }
+            else if(inst == "TYA"){
+                A = Y;
+                ZF(A == 0);
+                NF(A & N);
+            }
+
         }
 
     private:
@@ -138,24 +319,24 @@ class CPU {
         }
 
         //sets zero flag (gonna be doing this a lot)
-        void ZF(unsigned char in){
-            if(in == 0)
+        void ZF(bool in){
+            if(in)
                 P = P | Z;
             else
                 P = P & ~Z;
         }
 
         //sets negative flag (gonna be doing this a lot)
-        void NF(unsigned char in){
-            if(in & N)
+        void NF(bool in){
+            if(in)
                 P = P | N;
             else
                 P = P & ~N;
         }
 
         //sets overflow flag (gonna be doing this a lot)
-        void VF(unsigned char in){
-            if(in & V)
+        void VF(bool in){
+            if(in)
                 P = P | V;
             else
                 P = P & ~V;
