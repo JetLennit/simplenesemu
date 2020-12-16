@@ -215,7 +215,7 @@ class CPU {
                 PC = address;
             }
             else if(inst == "JSR"){
-                PC = address - 1;
+                PC = bus->getCPUMem(address);
             }
             else if(inst == "LDA"){
                 if(imm)
