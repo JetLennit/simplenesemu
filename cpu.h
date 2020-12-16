@@ -10,7 +10,6 @@ class CPU {
         unsigned char X;
         unsigned char Y;
         unsigned short PC;
-        unsigned char S;
         unsigned char P;
 
         //http://wiki.nesdev.com/w/index.php/Status_flags
@@ -26,7 +25,7 @@ class CPU {
             X = 0;
             Y = 0;
             PC = bus->getCPUMem(0xFFFC) + (bus->getCPUMem(0xFFFD)*256);
-            S = 0xFD;
+            pushS(0xFD);
             P = 0x34;
         }
 
@@ -42,13 +41,13 @@ class CPU {
                         break;
                     }
                 }
-                std::cout << "Instruction is " << currop.instruction << std::endl;
+                std::cout << "Instruction is " << currop.instruction << " " << std::hex << (int)currop.opcode << std::dec << std::endl;
             
                 unsigned short arg = 0;
 
-                if(currop.bytes = 2)
+                if(currop.bytes == 2)
                     arg = bus->getCPUMem(PC + 1);
-                else if(currop.bytes = 3)
+                else if(currop.bytes == 3)
                     arg = bus->getCPUMem(PC + 1) + (bus->getCPUMem(PC + 2)<<3);
 
                 std::cout << "Arg is " << (int)arg << std::endl;
@@ -116,7 +115,6 @@ class CPU {
             else if(inst == "BEQ"){
                 if(P & Z)
                     PC = PC + (signed char)address;
-                    std::cout << (int)((signed char)address) << std::endl;
             }
             else if(inst == "BIT"){
                 M = bus->getCPUMem(address) & A;
@@ -135,8 +133,12 @@ class CPU {
             else if(inst == "BPL"){
                 if(!(P & N))
                     PC = PC + (signed char)address;
+                    std::cout << "it should've worked, here's the address " << (int)((signed char)address);
             }
             else if(inst == "BRK"){
+                pushS((unsigned char)(PC>>3));
+                pushS((unsigned char)PC);
+                pushS(P);
                 P = P | B;
             }
             else if(inst == "BVC"){
@@ -215,7 +217,9 @@ class CPU {
                 PC = address;
             }
             else if(inst == "JSR"){
-                PC = bus->getCPUMem(address);
+                pushS((unsigned char)(PC>>3));
+                pushS((unsigned char)PC-1);
+                PC = address;
             }
             else if(inst == "LDA"){
                 if(imm)
@@ -266,20 +270,18 @@ class CPU {
                 A = A | M;
             }
             else if(inst == "PHA"){
-                S = A - 1;
+                pushS(A);
             }
             else if(inst == "PHP"){
-                S = P - 1;
+                pushS(P);
             }
             else if(inst == "PLA"){
-                A = S;
-                S--;
+                A = pullS();
                 ZF(A == 0);
                 NF(A & N);
             }
             else if(inst == "PLP"){
-                P = S;
-                S--;
+                P = pullS();
             }
             else if(inst == "ROL"){
                 bool ctmp = P & C;
@@ -316,10 +318,13 @@ class CPU {
                 }
             }
             else if(inst == "RTI"){
-                //add later
+                P = pullS();
+                M = pullS();
+                PC = M + (pullS() << 3);
             }
             else if(inst == "RTS"){
-                PC = S - 1;
+                M = pullS() + 1;
+                PC = M + (pullS() << 3);
             }
             else if(inst == "SBC"){
                 //add later
@@ -353,7 +358,7 @@ class CPU {
                 NF(Y & N);
             }
             else if(inst == "TSX"){
-                X = S;
+                X = pullS();
                 ZF(X == 0);
                 NF(X & N);
             }
@@ -363,7 +368,7 @@ class CPU {
                 NF(A & N);
             }
             else if(inst == "TXS"){
-                S = X;
+                pushS(X);
             }
             else if(inst == "TYA"){
                 A = Y;
@@ -490,6 +495,27 @@ class CPU {
                 P = P | V;
             else
                 P = P & ~V;
+        }
+        
+        //pushes to stack
+        bool pushS(unsigned char in){
+            if(bus->cpu_memory[0x0100]){
+                std::cerr << "Stack overflow error" << std::endl;
+                return false;
+            }
+            for(int i = 1; i < 0x100; i++){
+                bus->storeCPUMem(0x100+i, bus->getCPUMem(0x100 + i + 1));
+            }
+            return bus->storeCPUMem(0x1FF, in);
+        }
+        
+        //pulls from stack
+        unsigned char pullS(){
+            unsigned char ret = bus->getCPUMem(0x1FF);
+            for(int i = 0xFF; i >= 0; i--){
+                bus->storeCPUMem(0x100+i, bus->getCPUMem(0x100 + i - 1));
+            }
+            return ret;
         }
 };
 
