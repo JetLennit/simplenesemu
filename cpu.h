@@ -6,12 +6,12 @@ class CPU {
     public:
         Bus *bus;
         //http://wiki.nesdev.com/w/index.php/CPU_registers
-        unsigned char A = 0;
-        unsigned char X = 0;
-        unsigned char Y = 0;
-        unsigned short PC = 0xFFFC;
-        unsigned char S = 0xFD;
-        unsigned char P = 0x34;
+        unsigned char A;
+        unsigned char X;
+        unsigned char Y;
+        unsigned short PC;
+        unsigned char S;
+        unsigned char P;
 
         //http://wiki.nesdev.com/w/index.php/Status_flags
         unsigned char C = 0b00000001;
@@ -21,7 +21,17 @@ class CPU {
         unsigned char V = 0b01000000;
         unsigned char N = 0b10000000;
         
-        bool step(){
+        void init(){
+            A = 0;
+            X = 0;
+            Y = 0;
+            PC = bus->getCPUMem(0xFFFC) + (bus->getCPUMem(0xFFFD)*256);
+            S = 0xFD;
+            P = 0x34;
+        }
+
+
+        std::string step(){
             unsigned char ophex = bus->getCPUMem(PC);
             if(ophex != 0x22){
                 OPCODE currop;
@@ -32,28 +42,35 @@ class CPU {
                         break;
                     }
                 }
+                std::cout << "Instruction is " << currop.instruction << std::endl;
             
                 unsigned short arg = 0;
 
                 if(currop.bytes = 2)
                     arg = bus->getCPUMem(PC + 1);
                 else if(currop.bytes = 3)
-                    arg = bus->getCPUMem(PC + 1) & (bus->getCPUMem(PC + 2)<<3);
+                    arg = bus->getCPUMem(PC + 1) + (bus->getCPUMem(PC + 2)<<3);
 
-                PC++;
+                std::cout << "Arg is " << (int)arg << std::endl;
+
                 runOpcode(currop, arg);
 
-                return true;
+                return currop.instruction;
             }
-            return false;
+            return "rip";
         }
 
         void runOpcode(OPCODE op, unsigned short arg){
             //for instructions that interact with memory
             unsigned char M = 0;
+            unsigned short tmpPC = PC;
 
             bool acc = false;
+            bool imm = false;
             unsigned short address = 0;
+            
+            if(op.addressmode == 0x8)
+                imm = true;
 
             if(op.addressmode == 0x7)
                 acc = true;
@@ -65,7 +82,10 @@ class CPU {
                 //add later
             }
             else if(inst == "AND"){
-                A = A & bus->getCPUMem(address);
+                if(imm)
+                    A = A & address;
+                else
+                    A = A & bus->getCPUMem(address);
                 ZF(A == 0);
                 NF(A & N);
             }
@@ -87,15 +107,16 @@ class CPU {
             }
             else if(inst == "BCC"){
                 if(!(P & C))
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BCS"){
                 if(P & C)
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BEQ"){
                 if(P & Z)
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
+                    std::cout << (int)((signed char)address) << std::endl;
             }
             else if(inst == "BIT"){
                 M = bus->getCPUMem(address) & A;
@@ -105,26 +126,26 @@ class CPU {
             }
             else if(inst == "BMI"){
                 if(P & N)
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BNE"){
                 if(!(P & Z))
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BPL"){
                 if(!(P & N))
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BRK"){
                 P = P | B;
             }
             else if(inst == "BVC"){
                 if(!(P & V))
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "BVS"){
                 if(P & V)
-                    PC = PC + (signed short)address;
+                    PC = PC + (signed char)address;
             }
             else if(inst == "CLC"){
                 CF(false);
@@ -139,17 +160,26 @@ class CPU {
                 VF(false);
             }
             else if(inst == "CMP"){
-                M = bus->getCPUMem(address);
+                if(imm)
+                    M = address;
+                else
+                    M = bus->getCPUMem(address);
                 CF(A >= M);
                 ZF(A == M);
             }
             else if(inst == "CPX"){
-                M = bus->getCPUMem(address);
+                if(imm)
+                    M = address;
+                else
+                    M = bus->getCPUMem(address);
                 CF(X >= M);
                 ZF(X == M);
             }
             else if(inst == "CPY"){
-                M = bus->getCPUMem(address);
+                if(imm)
+                    M = address;
+                else
+                    M = bus->getCPUMem(address);
                 CF(Y >= M);
                 ZF(Y == M);
             }
@@ -164,7 +194,10 @@ class CPU {
                 Y--;
             }
             else if(inst == "EOR"){
-                A = A ^ bus->getCPUMem(address);
+                if(imm)
+                    A = A ^ address;
+                else
+                    A = A ^ bus->getCPUMem(address);
                 ZF(A == 0);
                 NF(A & N);
             }
@@ -185,17 +218,26 @@ class CPU {
                 PC = address - 1;
             }
             else if(inst == "LDA"){
-                A = bus->getCPUMem(address);
+                if(imm)
+                    A = address;
+                else
+                    A = bus->getCPUMem(address);
                 ZF(A == 0);
                 NF(A & N);
             }
             else if(inst == "LDX"){
-                X = bus->getCPUMem(address);
+                if(imm)
+                    X = address;
+                else
+                    X = bus->getCPUMem(address);
                 ZF(X == 0);
                 NF(X & N);
             }
             else if(inst == "LDY"){
-                Y = bus->getCPUMem(address);
+                if(imm)
+                    Y = address;
+                else
+                    Y = bus->getCPUMem(address);
                 ZF(Y == 0);
                 NF(Y & N);
             }
@@ -217,7 +259,10 @@ class CPU {
             }
             else if(inst == "NOP");
             else if(inst == "ORA"){
-                M = bus->getCPUMem(address);
+                if(imm)
+                    M = address;
+                else
+                    M = bus->getCPUMem(address);
                 A = A | M;
             }
             else if(inst == "PHA"){
@@ -280,7 +325,13 @@ class CPU {
                 //add later
             }
             else if(inst == "SEC"){
-                P = P & C;
+                P = P | C;
+            }
+            else if(inst == "SED"){
+                //unused by nes
+            }
+            else if(inst == "SEI"){
+                P = P | I;
             }
             else if(inst == "STA"){
                 bus->storeCPUMem(A, address);
@@ -343,12 +394,58 @@ class CPU {
             else if(inst == "SYA");
             else if(inst == "XAA");
             else if(inst == "XAS");
+
+            if(PC == tmpPC)
+                PC = PC + op.bytes;
         }
 
     private:
         unsigned short getAddress(unsigned short input, unsigned char mode){
+            unsigned short tmp;
             switch(mode){
-                //add modes later
+                case 0x0:
+                    return (input + X) % 0xFF;
+                    break;
+                case 0x1:
+                    return (input + Y) % 0xFF;
+                    break;
+                case 0x2:
+                    return input + X;
+                    break;
+                case 0x3:
+                    return input + Y;
+                    break;
+                case 0x4:
+                    return (bus->getCPUMem(input) + X) % 0xFF;
+                    break;
+                case 0x5:
+                    return bus->getCPUMem(input) + Y;
+                    break;
+                case 0x6:
+                    return 0;
+                    break;
+                case 0x7:
+                    return 0;
+                    break;
+                case 0x8:
+                    return input;
+                    break;
+                case 0x9:
+                    return input;
+                    break;
+                case 0xA:
+                    return input;
+                    break;
+                case 0xB:
+                    return input;
+                    break;
+                case 0xC:
+                    tmp = bus->getCPUMem(input) + (bus->getCPUMem(input + 1)<<3);
+                    return tmp;
+                    break;
+                case 0xD:
+                    return 0;
+                    break;
                 default: 
                     return 0;
                     break;

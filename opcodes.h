@@ -19,7 +19,7 @@ typedef struct OPCODE_s OPCODE;
     0x3. absolute,Y
     0x4. (indirect,X)
     0x5. (indirect),Y
-    0x6. implicit
+    0x6. implicit (accidentally replaced this with implied, may fix later)
     0x7. accumulator
     0x8. #immediate
     0x9. zero page

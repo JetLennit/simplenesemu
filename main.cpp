@@ -24,12 +24,22 @@ PPU ppu;
 void initSys(){
     apu.bus = &bus;
     cpu.bus = &bus;
+    cpu.init();
     ppu.bus = &bus;
 }
 
 int main(){
-    initSys();
     bus.loadROM("Super Mario Bros..nes");
+    initSys();
+    while(true){
+        cpu.step();
+        std::cout << "X is " << (int)cpu.X << std::endl;
+        std::cout << "Y is " << (int)cpu.Y << std::endl;
+        std::cout << "A is " << (int)cpu.A << std::endl;
+        std::cout << "PC is " << (int)cpu.PC << std::endl;
+        std::cout << "$0000 is " << (int)bus.getCPUMem(0) << std::endl;
+        std::cin.get();
+    }
     return 0;
 }
 
