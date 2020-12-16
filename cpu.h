@@ -247,7 +247,7 @@ class CPU {
                 //add later
             }
             else if(inst == "SBC"){
-                CF(true);
+                //add later
             }
             else if(inst == "SEC"){
                 //unused on the nes
@@ -289,7 +289,31 @@ class CPU {
                 ZF(A == 0);
                 NF(A & N);
             }
+            else if(inst == "DOP");
+            else if(inst == "TOP");
+            else if
 
+            //illegal opcodes (very few games use them, may add support later)
+            else if(inst == "AAC");
+            else if(inst == "AAX");
+            else if(inst == "ARR");
+            else if(inst == "ASR");
+            else if(inst == "ATX");
+            else if(inst == "AXA");
+            else if(inst == "AXS");
+            else if(inst == "DCP");
+            else if(inst == "ISC");
+            else if(inst == "KIL");
+            else if(inst == "LAR");
+            else if(inst == "LAX");
+            else if(inst == "RLA");
+            else if(inst == "RRA");
+            else if(inst == "SLO");
+            else if(inst == "SRE");
+            else if(inst == "SXA");
+            else if(inst == "SYA");
+            else if(inst == "XAA");
+            else if(inst == "XAS");
         }
 
     private:
