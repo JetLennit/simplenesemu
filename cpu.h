@@ -9,7 +9,7 @@ class CPU {
         unsigned char A = 0;
         unsigned char X = 0;
         unsigned char Y = 0;
-        unsigned short PC = 0;
+        unsigned short PC = 0xFFFC;
         unsigned char S = 0xFD;
         unsigned char P = 0x34;
 
@@ -20,29 +20,47 @@ class CPU {
         unsigned char B = 0b00110000;
         unsigned char V = 0b01000000;
         unsigned char N = 0b10000000;
-
-        void runOpcode(unsigned char op, unsigned short arg){
-            OPCODE currop;
-            //check get instruction from opcode (will be removed later when i order opcodes)
-            for(int o = 0; o < (sizeof(opcode)/sizeof(opcode[0])); o++){
-                if(op == opcode[o].opcode){
-                    currop = opcode[o];
-                    break;
+        
+        bool step(){
+            unsigned char ophex = bus->getCPUMem(PC);
+            if(ophex != 0x22){
+                OPCODE currop;
+                //check get instruction from opcode (will be removed later when i order opcodes)
+                for(int o = 0; o < (sizeof(opcode)/sizeof(opcode[0])); o++){
+                    if(ophex == opcode[o].opcode){
+                        currop = opcode[o];
+                        break;
+                    }
                 }
+            
+                unsigned short arg = 0;
+
+                if(currop.bytes = 2)
+                    arg = bus->getCPUMem(PC + 1);
+                else if(currop.bytes = 3)
+                    arg = bus->getCPUMem(PC + 1) & (bus->getCPUMem(PC + 2)<<3);
+
+                PC++;
+                runOpcode(currop, arg);
+
+                return true;
             }
-            
-            bool acc = false;
-            unsigned short address = 0;
-            
+            return false;
+        }
+
+        void runOpcode(OPCODE op, unsigned short arg){
             //for instructions that interact with memory
             unsigned char M = 0;
 
-            if(currop.addressmode == 0x7)
+            bool acc = false;
+            unsigned short address = 0;
+
+            if(op.addressmode == 0x7)
                 acc = true;
             else
-                address = getAddress(arg, currop.addressmode);
+                address = getAddress(arg, op.addressmode);
 
-            std::string inst = currop.instruction;
+            std::string inst = op.instruction;
             if(inst == "ADC"){
                 //add later
             }
@@ -53,14 +71,14 @@ class CPU {
             }
             else if(inst == "ASL"){
                 if(acc){
-                    CF(A & 0b10000000);
+                    CF(A & C);
                     A = A << 1;
                 ZF(A == 0);
                 NF(A & N);
                 }
                 else{
                     M = bus->getCPUMem(address);
-                    CF(M & 0b00000001);
+                    CF(M & C);
                     M = M << 1;
                     bus->storeCPUMem(address, M);
                     ZF(M == 0);
@@ -68,13 +86,16 @@ class CPU {
                 }
             }
             else if(inst == "BCC"){
-                //add later
+                if(!(P & C))
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BCS"){
-                //add later
+                if(P & C)
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BEQ"){
-                //add later
+                if(P & Z)
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BIT"){
                 M = bus->getCPUMem(address) & A;
@@ -83,22 +104,27 @@ class CPU {
                 VF(M & V);
             }
             else if(inst == "BMI"){
-                //add later
+                if(P & N)
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BNE"){
-                //add later
+                if(!(P & Z))
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BPL"){
-                //add later
+                if(!(P & N))
+                    PC = PC + (signed short)address;
             }
             else if(inst == "BRK"){
-                //add later
+                P = P | B;
             }
             else if(inst == "BVC"){
-                //add later
+                if(!(P & V))
+                    PC = PC + (signed short)address;
             }
-            else if(inst == "BRS"){
-                //add later
+            else if(inst == "BVS"){
+                if(P & V)
+                    PC = PC + (signed short)address;
             }
             else if(inst == "CLC"){
                 CF(false);
@@ -153,10 +179,10 @@ class CPU {
                 Y++;
             }
             else if(inst == "JMP"){
-                //add later
+                PC = address;
             }
             else if(inst == "JSR"){
-                //add later
+                PC = address - 1;
             }
             else if(inst == "LDA"){
                 A = bus->getCPUMem(address);
@@ -175,14 +201,14 @@ class CPU {
             }
             else if(inst == "LSR"){
                 if(acc){
-                    CF(A & 0b00000001);
+                    CF(A & C);
                     A = A >> 1;
                     ZF(A == 0);
                     NF(A & N);
                 }
                 else{
                     M = bus->getCPUMem(address);
-                    CF(M & 0b00000001);
+                    CF(M & C);
                     M = M >> 1;
                     bus->storeCPUMem(address, M);
                     ZF(M == 0);
@@ -195,28 +221,32 @@ class CPU {
                 A = A | M;
             }
             else if(inst == "PHA"){
-                //add later
+                S = A - 1;
             }
             else if(inst == "PHP"){
-                //add later
+                S = P - 1;
             }
             else if(inst == "PLA"){
-                //add later
+                A = S;
+                S--;
+                ZF(A == 0);
+                NF(A & N);
             }
             else if(inst == "PLP"){
-                //add later
+                P = S;
+                S--;
             }
             else if(inst == "ROL"){
                 bool ctmp = P & C;
                 if(acc){
-                    CF(A & 0b10000000);
+                    CF(A & C);
                     A = (A << 1) | ctmp;
                     ZF(A == 0);
                     NF(A & N);
                 }
                 else{
                     M = bus->getCPUMem(address);
-                    CF(M & 0b10000000);
+                    CF(M & C);
                     M = (M << 1) | ctmp;
                     bus->storeCPUMem(address, M);
                     ZF(M == 0);
@@ -226,14 +256,14 @@ class CPU {
             else if(inst == "ROR"){
                 bool ctmp = P & C;
                 if(acc){
-                    CF(A & 0b00000001);
+                    CF(A & C);
                     A = (A >> 1) | (A << 7);
                     ZF(A == 0);
                     NF(A & N);
                 }
                 else{
                     M = bus->getCPUMem(address);
-                    CF(M & 0b00000001);
+                    CF(M & C);
                     M = (M >> 1) | (ctmp << 7);
                     bus->storeCPUMem(address, M);
                     ZF(M == 0);
@@ -244,13 +274,13 @@ class CPU {
                 //add later
             }
             else if(inst == "RTS"){
-                //add later
+                PC = S - 1;
             }
             else if(inst == "SBC"){
                 //add later
             }
             else if(inst == "SEC"){
-                //unused on the nes
+                P = P & C;
             }
             else if(inst == "STA"){
                 bus->storeCPUMem(A, address);
@@ -291,7 +321,6 @@ class CPU {
             }
             else if(inst == "DOP");
             else if(inst == "TOP");
-            else if
 
             //illegal opcodes (very few games use them, may add support later)
             else if(inst == "AAC");

@@ -85,7 +85,8 @@ class Bus {
             //make sure that location is within memory
             if(location > 0xFFFF){
                 std::cerr << "Trying to access memory out of range" << std::endl;
-                return 0;
+                //return kil instruction, can't think of a better way to give error
+                return 0x22;
             }
 
             if(location < 0x2000) 
@@ -95,6 +96,6 @@ class Bus {
             else 
                 return cpu_memory[location];
 
-            return 0;
+            return 0x22;
         }   
 };
