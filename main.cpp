@@ -14,9 +14,6 @@
 //using namespace std;
 //if only i could
 
-//clock speed is 1.79 MHz
-const int CLOCK_SPEED = 1790000;
-
 Bus bus;
 APU apu;
 CPU cpu;

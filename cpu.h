@@ -4,6 +4,9 @@ Handles the CPU (and, honestly, tons of other stuff because the CPU is also in c
 
 class CPU {
     public:
+        //clock speed is 1.79 MHz
+        const int CLOCK_SPEED = 1790000;
+        
         Bus *bus;
         //http://wiki.nesdev.com/w/index.php/CPU_registers
         unsigned char A;
