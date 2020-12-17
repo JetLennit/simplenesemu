@@ -20,10 +20,14 @@ class CPU {
         unsigned char V = 0b01000000;
         unsigned char N = 0b10000000;
         
-        void init(){
+        void init(std::string rom){
             A = 0;
             X = 0;
             Y = 0;
+            for(int i = 0; i < (sizeof(bus->cpu_memory)/sizeof(bus->cpu_memory[0])); i++)
+                bus->cpu_memory[i] = 0;
+                
+            bus->loadROM(rom);
             PC = bus->getCPUMem(0xFFFC) + (bus->getCPUMem(0xFFFD)*256);
             pushS(0xFD);
             P = 0x34;
@@ -42,13 +46,17 @@ class CPU {
                     }
                 }
                 std::cout << "Instruction is " << currop.instruction << " " << std::hex << (int)currop.opcode << std::dec << std::endl;
+                std::cout << "X is " << (int)X << std::endl;
+                std::cout << "Y is " << (int)Y << std::endl;
+                std::cout << "A is " << (int)A << std::endl;
+                std::cout << "PC is " << (int)PC-0x8000 << std::endl;
             
                 unsigned short arg = 0;
 
                 if(currop.bytes == 2)
                     arg = bus->getCPUMem(PC + 1);
                 else if(currop.bytes == 3)
-                    arg = bus->getCPUMem(PC + 1) + (bus->getCPUMem(PC + 2)<<3);
+                    arg = bus->getCPUMem(PC + 1) + (bus->getCPUMem(PC + 2)*256);
 
                 std::cout << "Arg is " << (int)arg << std::endl;
 
@@ -62,7 +70,6 @@ class CPU {
         void runOpcode(OPCODE op, unsigned short arg){
             //for instructions that interact with memory
             unsigned char M = 0;
-            unsigned short tmpPC = PC;
 
             bool acc = false;
             bool imm = false;
@@ -133,10 +140,9 @@ class CPU {
             else if(inst == "BPL"){
                 if(!(P & N))
                     PC = PC + (signed char)address;
-                    std::cout << "it should've worked, here's the address " << (int)((signed char)address);
             }
             else if(inst == "BRK"){
-                pushS((unsigned char)(PC>>3));
+                pushS((unsigned char)(PC>>4));
                 pushS((unsigned char)PC);
                 pushS(P);
                 P = P | B;
@@ -217,7 +223,7 @@ class CPU {
                 PC = address;
             }
             else if(inst == "JSR"){
-                pushS((unsigned char)(PC>>3));
+                pushS((unsigned char)(PC>>4));
                 pushS((unsigned char)PC-1);
                 PC = address;
             }
@@ -304,14 +310,14 @@ class CPU {
                 bool ctmp = P & C;
                 if(acc){
                     CF(A & C);
-                    A = (A >> 1) | (A << 7);
+                    A = (A >> 1) | (A << 8);
                     ZF(A == 0);
                     NF(A & N);
                 }
                 else{
                     M = bus->getCPUMem(address);
                     CF(M & C);
-                    M = (M >> 1) | (ctmp << 7);
+                    M = (M >> 1) | (ctmp << 8);
                     bus->storeCPUMem(address, M);
                     ZF(M == 0);
                     NF(M & N);
@@ -320,11 +326,11 @@ class CPU {
             else if(inst == "RTI"){
                 P = pullS();
                 M = pullS();
-                PC = M + (pullS() << 3);
+                PC = M + (pullS()*256);
             }
             else if(inst == "RTS"){
-                M = pullS() + 1;
-                PC = M + (pullS() << 3);
+                M = pullS();
+                PC = M + (pullS()*256);
             }
             else if(inst == "SBC"){
                 //add later
@@ -400,8 +406,7 @@ class CPU {
             else if(inst == "XAA");
             else if(inst == "XAS");
 
-            if(PC == tmpPC)
-                PC = PC + op.bytes;
+            PC = PC + op.bytes;
         }
 
     private:
@@ -445,7 +450,7 @@ class CPU {
                     return input;
                     break;
                 case 0xC:
-                    tmp = bus->getCPUMem(input) + (bus->getCPUMem(input + 1)<<3);
+                    tmp = bus->getCPUMem(input) + (bus->getCPUMem(input+1)*256);
                     return tmp;
                     break;
                 case 0xD:

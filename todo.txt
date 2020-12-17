@@ -1,7 +1,7 @@
 Main
-1) CPU http://wiki.nesdev.com/w/index.php/2A03
-2) Opcodes
-3) Make stack work (I didn't understand it before)
+1) CPU http://wiki.nesdev.com/w/index.php/2A03 (iffy)
+2) Opcodes DONE! (technically)
+3) Make stack work (I didn't understand it before) DONE!
 4) Basic APU (no functionality) http://wiki.nesdev.com/w/index.php/APU
 5) PPU http://wiki.nesdev.com/w/index.php/PPU
 6) Implement SDL2 (if nothing else so we can use it's delay function for cpu timing)

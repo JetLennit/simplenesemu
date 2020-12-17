@@ -54,7 +54,15 @@ class Bus {
             if(rom.mapper == 0){
                 //this assumes the specific rom of smb, i'll fix it later to include other nrom games
                 //load cartridge prg-rom into cpu memory
-                for(int i = 0; i < rom.prglen; i++) cpu_memory[0x8000 + i] = rom.prg[i];
+                if(rom.prglen == 32768)
+                    for(int i = 0; i < rom.prglen; i++) 
+                        cpu_memory[0x8000 + i] = rom.prg[i];
+                else if(rom.prglen == 16384){
+                    for(int i = 0; i < rom.prglen; i++){
+                        cpu_memory[0x8000 + i] = rom.prg[i];
+                        cpu_memory[0x8000 + i + 16384] = rom.prg[i];
+                    }
+                }
                 //add ppu memory later
                 return 1;
             }
@@ -70,7 +78,6 @@ class Bus {
                 std::cerr << "Trying to access memory out of range" << std::endl;
                 return false;
             }
-
             if(location < 0x2000) 
                 ram[location % 0x800] = stored;
             else if(location < 0x4000) 
@@ -91,8 +98,15 @@ class Bus {
 
             if(location < 0x2000) 
                 return ram[location % 0x800];
-            else if(location < 0x4000) 
+            else if(location < 0x4000) {
+                //hacked a bit to make vblank work
+                unsigned short tmp = location % 0x8;
+                if(tmp == 2){
+                    if(*PPUSTATUS == 0x00) *PPUSTATUS = 0x80;
+                    else *PPUSTATUS = 0x00;
+                }
                 return ppu_reg[location % 0x8];
+            }
             else 
                 return cpu_memory[location];
 
