@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 #include <string.h>
 #include <stdlib.h> 
 
@@ -24,16 +25,18 @@ PPU ppu;
 void initSys(){
     apu.bus = &bus;
     cpu.bus = &bus;
-    cpu.init("Super Mario Bros..nes");
+    cpu.init("Burgertime.nes");
     ppu.bus = &bus;
 }
 
 int main(){
     initSys();
-    while(true){
+    char cmd;
+    while(cmd != 'q' && cmd != 'Q'){
         cpu.step();
-        std::cin.get();
+        cmd = getchar();
     }
+    bus.dumpRAM();
     return 0;
 }
 
