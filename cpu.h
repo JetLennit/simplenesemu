@@ -49,7 +49,7 @@ class CPU {
                 std::cout << "X is " << (int)X << std::endl;
                 std::cout << "Y is " << (int)Y << std::endl;
                 std::cout << "A is " << (int)A << std::endl;
-                std::cout << "PC is " << (int)PC-0x8000 << std::endl;
+                std::cout << "PC is " << (int)PC << std::endl;
             
                 unsigned short arg = 0;
 
@@ -146,6 +146,7 @@ class CPU {
                 pushS((unsigned char)PC);
                 pushS(P);
                 P = P | B;
+                PC = bus->getCPUMem(0xFFFE) + (bus->getCPUMem(0xFFFF)*256);
             }
             else if(inst == "BVC"){
                 if(!(P & V))

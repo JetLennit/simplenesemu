@@ -48,6 +48,12 @@ class Bus {
         //I'm not gonna deal with the CPU test mode registers, they don't really seem to matter
         //I'm also not sure if we need to put the data from the ROM into here, only time will tell
 
+        void dumpRAM(){
+            for(int i = 0; i < 0x800; i++)
+                if(ram[i])
+                    std::cout << "$" << std::hex << i << std::dec << ": " << std::hex << (int)ram[i] << std::dec << std::endl;
+        }
+
         //here's where the rom is mapped to memory, it's also where we'll need to do a lot of work later to make other games work
         bool loadROM(std::string romname){
             ROM rom = readROM(romname);
