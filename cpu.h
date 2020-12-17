@@ -40,14 +40,8 @@ class CPU {
         std::string step(){
             unsigned char ophex = bus->getCPUMem(PC);
             if(ophex != 0x22){
-                OPCODE currop;
-                //check get instruction from opcode (will be removed later when i order opcodes)
-                for(int o = 0; o < (sizeof(opcode)/sizeof(opcode[0])); o++){
-                    if(ophex == opcode[o].opcode){
-                        currop = opcode[o];
-                        break;
-                    }
-                }
+                OPCODE currop = opcode[ophex];
+
                 std::cout << "Instruction is " << currop.instruction << " " << std::hex << (int)currop.opcode << std::dec << std::endl;
                 std::cout << "X is " << (int)X << std::endl;
                 std::cout << "Y is " << (int)Y << std::endl;
