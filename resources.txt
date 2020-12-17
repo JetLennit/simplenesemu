@@ -1,0 +1,12 @@
+General reference:
+    http://wiki.nesdev.com/w/index.php/NES_reference_guide
+    https://nescartdb.com/
+    
+Opcode reference:
+    http://obelisk.me.uk/6502/reference.html
+    http://nesdev.com/undocumented_opcodes.txt
+    http://nparker.llx.com/a2/opcodes.html
+
+Overviews:
+    https://yizhang82.dev/nes-emu-overview
+    https://ltriant.github.io/2019/11/22/nes-emulator.html
