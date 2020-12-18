@@ -9,6 +9,7 @@ class ROM {
         //see http://wiki.nesdev.com/w/index.php/NES_2.0
         bool isines2;
         bool hasTrainer;
+        bool mirror;
         int prglen;
         int chrlen;
         unsigned char mapper;
@@ -32,11 +33,14 @@ ROM readROM(std::string romname){
     rom.header = (unsigned char*)calloc(1, 16);
     romf.read((char*)rom.header,16);
     
+    //only works with certain mappers, figure out later
+    rom.mirror = (rom.header[6]&0b00000001);
+
+    rom.mapper = ((rom.header[6] & 0b11110000) >> 4) | (rom.header[7] & 0b11110000);
+
     //check for trainer and ines2.0
     rom.hasTrainer = (rom.header[6]&4) != 0 ? true : false; 
     rom.isines2 = (rom.header[7]&0x0C) == 8 ? true : false;
-
-    rom.mapper = ((rom.header[6] & 0b11110000) >> 4) | (rom.header[7] & 0b11110000);
 
     //if there is a trainer read and go past that (for the most part we don't need to worry about the trainer)
     //http://wiki.nesdev.com/w/index.php/INES#Trainer

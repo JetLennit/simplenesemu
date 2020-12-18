@@ -4,6 +4,8 @@ Handles the memory mostly
 
 class Bus {
     public:
+        ROM rom;
+
         //http://wiki.nesdev.com/w/index.php/CPU_memory_map
         unsigned char cpu_memory[0xFFFF] = {};
 
@@ -48,6 +50,8 @@ class Bus {
         //I'm not gonna deal with the CPU test mode registers, they don't really seem to matter
         //I'm also not sure if we need to put the data from the ROM into here, only time will tell
 
+        unsigned char ppu_memory[0x3FFF] = {};
+
         void dumpRAM(){
             for(int i = 0; i < 0x800; i++)
                 if(ram[i])
@@ -56,7 +60,7 @@ class Bus {
 
         //here's where the rom is mapped to memory, it's also where we'll need to do a lot of work later to make other games work
         bool loadROM(std::string romname){
-            ROM rom = readROM(romname);
+            rom = readROM(romname);
             if(rom.mapper == 0){
                 //this assumes the specific rom of smb, i'll fix it later to include other nrom games
                 //load cartridge prg-rom into cpu memory
