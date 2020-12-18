@@ -74,7 +74,11 @@ class Bus {
                         cpu_memory[0x8000 + i + 16384] = rom.prg[i];
                     }
                 }
-                //add ppu memory later
+                
+                //load cartridge chr-rom into ppu memory
+                for(int i = 0; i < rom.chrlen; i++)
+                    ppu_memory[i] = rom.chr[i];
+
                 return true;
             }
             else{
