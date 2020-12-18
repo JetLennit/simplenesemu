@@ -5,7 +5,8 @@ Handles the memory mostly
 class Bus {
     public:
         ROM rom;
-
+        PPU *ppu;
+        
         //CPU MEMORY
         //http://wiki.nesdev.com/w/index.php/CPU_memory_map
         unsigned char cpu_memory[0xFFFF] = {};
@@ -89,6 +90,7 @@ class Bus {
         //this section is mirrored too, resolve later
 
         void dumpRAM(){
+            std::cout << std::endl;
             for(int i = 0; i < 0x800; i++)
                 if(ram[i])
                     std::cout << "$" << std::hex << i << std::dec << ": " << std::hex << (int)ram[i] << std::dec << std::endl;
@@ -132,7 +134,9 @@ class Bus {
             if(location < 0x2000) 
                 ram[location % 0x800] = stored;
             else if(location < 0x4000) 
-                ppu_reg[location % 0x8] = stored;
+                return ppu->storePPUReg(location % 0x8, stored);
+            else if(location == 0x4014)
+                return ppu->OAMDMA(stored);
             else 
                 cpu_memory[location] = stored;
 
@@ -149,15 +153,8 @@ class Bus {
 
             if(location < 0x2000) 
                 return ram[location % 0x800];
-            else if(location < 0x4000) {
-                //hacked a bit to make vblank work
-                unsigned short tmp = location % 0x8;
-                if(tmp == 2){
-                    if(*PPUSTATUS == 0x00) *PPUSTATUS = 0x80;
-                    else *PPUSTATUS = 0x00;
-                }
-                return ppu_reg[location % 0x8];
-            }
+            else if(location < 0x4000)
+                return ppu->getPPUReg(location % 0x8);
             else 
                 return cpu_memory[location];
 

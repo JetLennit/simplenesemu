@@ -20,6 +20,7 @@ CPU cpu;
 PPU ppu;
 
 void initSys(){
+    bus.ppu = &ppu;
     apu.bus = &bus;
     cpu.bus = &bus;
     cpu.init("Burgertime.nes");
