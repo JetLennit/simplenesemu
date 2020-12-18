@@ -6,6 +6,7 @@ class Bus {
     public:
         ROM rom;
 
+        //CPU MEMORY
         //http://wiki.nesdev.com/w/index.php/CPU_memory_map
         unsigned char cpu_memory[0xFFFF] = {};
 
@@ -50,7 +51,42 @@ class Bus {
         //I'm not gonna deal with the CPU test mode registers, they don't really seem to matter
         //I'm also not sure if we need to put the data from the ROM into here, only time will tell
 
+        //PPU MEMORY
+        //Object Attribute Memory (https://wiki.nesdev.com/w/index.php/PPU_OAM)
+        unsigned char OAM[0xFF] = {};
+
+        //https://wiki.nesdev.com/w/index.php/PPU_memory_map
         unsigned char ppu_memory[0x3FFF] = {};
+
+        //$0000 - $1FFF (full pattern table)
+        unsigned char *pattern_table = ppu_memory;
+
+        //$0000 - $1FFF (pattern tables 0-1) (not sure if this is neccessary yet)
+        unsigned char *pattern_table1 = pattern_table;
+        unsigned char *pattern_table2 = pattern_table1 + 0x1000;
+
+        //$2000 - $2FFF (full name table)
+        unsigned char *name_table = ppu_memory + 0x2000;
+
+        //$2000 - $2FFF (name tables 0-3) (not sure if this is neccessary yet)
+        unsigned char *name_table0 = name_table;
+        unsigned char *name_table1 = name_table + 0x0400;
+        unsigned char *name_table2 = name_table + 0x0800;
+        unsigned char *name_table3 = name_table + 0x0C00;
+        //this section is mirrored, resolve later
+
+        //$3F00 - $3F1F (https://wiki.nesdev.com/w/index.php/PPU_palettes)
+        unsigned char *palette_map = ppu_memory + 0x3F00;
+        unsigned char *universal_background_color = palette_map;
+        unsigned char *background_palette0 = palette_map + 0x01;
+        unsigned char *background_palette1 = palette_map + 0x05;
+        unsigned char *background_palette2 = palette_map + 0x09;
+        unsigned char *background_palette3 = palette_map + 0x0D;
+        unsigned char *sprite_palette0 = palette_map + 0x11;
+        unsigned char *sprite_palette1 = palette_map + 0x15;
+        unsigned char *sprite_palette2 = palette_map + 0x19;
+        unsigned char *sprite_palette3 = palette_map + 0x1D;
+        //this section is mirrored too, resolve later
 
         void dumpRAM(){
             for(int i = 0; i < 0x800; i++)
@@ -77,7 +113,7 @@ class Bus {
                 
                 //load cartridge chr-rom into ppu memory
                 for(int i = 0; i < rom.chrlen; i++)
-                    ppu_memory[i] = rom.chr[i];
+                    pattern_table[i] = rom.chr[i];
 
                 return true;
             }
