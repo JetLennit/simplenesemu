@@ -14,17 +14,16 @@
 //using namespace std;
 //if only i could
 
-Bus bus;
-APU apu;
-CPU cpu;
-PPU ppu;
+//Future proofing
+std::string rom_name = "Burgertime.nes";
 
-void initSys(){
+Bus bus;
+APU apu(&bus);
+CPU cpu(rom_name, &bus);
+PPU ppu(&bus);
+
+void initSys() {
     bus.ppu = &ppu;
-    apu.bus = &bus;
-    cpu.bus = &bus;
-    cpu.init("Burgertime.nes");
-    ppu.bus = &bus;
 }
 
 int main(){

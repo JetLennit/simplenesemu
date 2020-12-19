@@ -1,3 +1,5 @@
+#include "bus.h"
+
 class PPU {
     public:
         Bus *bus;
@@ -5,7 +7,10 @@ class PPU {
         unsigned short PPUADDRstr = 0;
         unsigned short PPUSCROLLstr = 0;
 
-            
+        PPU(Bus* bus) {
+            this->bus = bus;
+        }
+        
         bool step(){
             //switch ppustatus back and forth (not accurate)
             if(*bus->PPUSTATUS == 0x00) *bus->PPUSTATUS = 0x80;
@@ -20,7 +25,7 @@ class PPU {
                     *bus->PPUCTRL = stored;
                     break;
                 case 3:
-                    *bus->PPUCTRL = stored;
+                    *bus->OAMADDR = stored;
                     break;
                 default:
                     return false;

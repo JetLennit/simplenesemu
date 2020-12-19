@@ -22,11 +22,12 @@ class CPU {
         unsigned char B = 0b00110000;
         unsigned char V = 0b01000000;
         unsigned char N = 0b10000000;
-        
-        void init(std::string rom){
+
+        CPU(std::string rom, Bus* bus) {
             A = 0;
             X = 0;
             Y = 0;
+            this->bus = bus;
             for(int i = 0; i < (sizeof(bus->cpu_memory)/sizeof(bus->cpu_memory[0])); i++)
                 bus->cpu_memory[i] = 0;
                 
@@ -81,8 +82,34 @@ class CPU {
                 address = getAddress(arg, op.addressmode);
 
             std::string inst = op.instruction;
+            //website I used to try and figure it out https://www.atariarchives.org/alp/appendix_1.php
             if(inst == "ADC"){
-                //add later
+                //It's a start, could be completely wrong
+                unsigned short value = 0;
+                unsigned char flags = P;
+                unsigned short result = 0;
+
+                if (!imm) {
+                    value = bus->getCPUMem(arg);
+                }
+                else {
+                    value = arg;
+                }
+                if ((flags & C) == C)
+                    result = A + value + 1;
+                else
+                    result = A + value;
+                if (((A ^ value) & 0x80 == 0 ) && ((A ^ result) & 0x80 != 0)) {
+                    VF(1);
+                    NF(1);
+                }
+                else {
+                    if (result = 0)
+                        ZF(1);
+                    NF(0);
+                }
+                A = result;
+                CF(0);
             }
             else if(inst == "AND"){
                 if(imm)
@@ -331,7 +358,33 @@ class CPU {
                 PC = M + (pullS()*256);
             }
             else if(inst == "SBC"){
-                //add later
+                //Same thing as ADC, just need to invert the value
+                unsigned short value = 0;
+                unsigned char flags = P;
+                unsigned short result = 0;
+
+                if (!imm) {
+                    value = bus->getCPUMem(arg);
+                }
+                else {
+                    value = arg;
+                }
+                ~value;
+                if ((flags & C) == C)
+                    result = A + value + 1;
+                else
+                    result = A + value;
+                if (((A ^ value) & 0x80 == 0 ) && ((A ^ result) & 0x80 != 0)) {
+                    VF(1);
+                    NF(1);
+                }
+                else {
+                    if (result = 0)
+                        ZF(1);
+                    NF(0);
+                }
+                A = result;
+                CF(0);
             }
             else if(inst == "SEC"){
                 P = P | C;
