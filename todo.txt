@@ -14,4 +14,4 @@ Extras:
 Look into an actual makefile  
 Implement joystick support
 Do we want to use macros for bit manipulation?
-Debugging info/checks using macros 
+Debugging info/checks using macros

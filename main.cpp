@@ -36,4 +36,3 @@ int main(){
     bus.dumpRAM();
     return 0;
 }
-

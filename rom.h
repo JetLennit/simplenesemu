@@ -19,7 +19,7 @@ class ROM {
         unsigned char *chr;
 };
 
-ROM readROM(std::string romname){
+ROM readROM(std::string romname) {
     ROM rom;
 
     //open rom file (not using the std namespace because you hate me)
