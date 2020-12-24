@@ -1,6 +1,7 @@
 /*
 Handles the memory mostly
 */
+#include "ppu.h"
 
 class Bus {
     public:

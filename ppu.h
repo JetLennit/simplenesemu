@@ -1,3 +1,5 @@
+#ifndef PPU_H
+#define PPU_H
 #include "macros.h"
 
 class PPU {
@@ -15,7 +17,7 @@ class PPU {
         }
         
         bool step() {
-            //switch ppustatus back and forth (not accurate)
+            // switch ppustatus back and forth (not accurate)
             // if(*bus->PPUSTATUS == 0x00) *bus->PPUSTATUS = 0x80;
             // else *bus->PPUSTATUS = 0x00;
             // return true;
@@ -111,3 +113,4 @@ class PPU {
             return copy;
         }
 };
+#endif 
