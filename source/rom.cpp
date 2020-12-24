@@ -1,23 +1,4 @@
-/*
-Handles the game ROM
-*/
-
-class ROM {
-    //http://wiki.nesdev.com/w/index.php/INES
-    public:
-        //we can worry about iNES2 later, most roms don't require the specific features and it's backwards compatibile with iNES
-        //see http://wiki.nesdev.com/w/index.php/NES_2.0
-        bool isines2;
-        bool hasTrainer;
-        bool mirror;
-        int prglen;
-        int chrlen;
-        unsigned char mapper;
-        unsigned char *header;
-        unsigned char *trainer;
-        unsigned char *prg;
-        unsigned char *chr;
-};
+#include "rom.h"
 
 ROM readROM(std::string romname) {
     ROM rom;

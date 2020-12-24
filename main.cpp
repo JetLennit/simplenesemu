@@ -5,9 +5,9 @@
 #include <stdlib.h> 
 
 #include "opcodes.h"
-#include "rom.h"
-#include "bus.h"
 #include "ppu.h"
+#include "bus.h"
+
 #include "apu.h"
 #include "cpu.h"
 
