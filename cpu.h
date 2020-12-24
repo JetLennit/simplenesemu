@@ -1,3 +1,4 @@
+#include "macros.h"
 /*
 Handles the CPU (and, honestly, tons of other stuff because the CPU is also in charge of most other things)
 */
@@ -574,4 +575,3 @@ class CPU {
             return ret;
         }
 };
-

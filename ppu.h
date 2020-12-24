@@ -1,4 +1,3 @@
-#include "bus.h"
 #include "macros.h"
 
 class PPU {
@@ -31,7 +30,7 @@ class PPU {
             {
                 BITSET(*bus->PPUSTATUS, 7);
                 nmi_occured = true;
-                //Other drawing stuff
+                
             }
             else if (PPUSCANLINES == 261 && PPUCYCLES == 1)
             {
