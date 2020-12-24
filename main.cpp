@@ -7,9 +7,9 @@
 #include "opcodes.h"
 #include "rom.h"
 #include "bus.h"
+#include "ppu.h"
 #include "apu.h"
 #include "cpu.h"
-#include "ppu.h"
 
 //using namespace std;
 //if only i could

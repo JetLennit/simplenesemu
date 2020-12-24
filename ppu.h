@@ -1,5 +1,3 @@
-#ifndef PPU_H
-#define PPU_H
 #include "macros.h"
 
 class PPU {
@@ -113,4 +111,3 @@ class PPU {
             return copy;
         }
 };
-#endif 
