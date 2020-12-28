@@ -39,9 +39,6 @@ bool PPU::storePPUReg(unsigned short location, unsigned char stored) {
 		case 1:
 			*bus->PPUMASK = stored;
 			break;
-		case 2:
-			*bus->PPUSTATUS = stored;
-			break;
 		case 3:
 			*bus->OAMADDR = stored;
 			break;
@@ -67,20 +64,10 @@ bool PPU::storePPUReg(unsigned short location, unsigned char stored) {
 // I Will need to take another look at wiki
 unsigned char PPU::getPPUReg(unsigned short location) { 
 	switch(location) {
-		case 0:
-			return *bus->PPUCTRL;
-		case 1:
-			return *bus->PPUMASK;
 		case 2:
-			return *bus->PPUSTATUS;
-		case 3:
-			return *bus->OAMADDR;
+			return this->getPPUStatus(); 
 		case 4:
 			return *bus->OAMDATA;
-		case 5:
-			return *bus->PPUSCROLL;
-		case 6:
-			return *bus->PPUADDR;
 		case 7:
 			return *bus->PPUDATA;
 		default:
